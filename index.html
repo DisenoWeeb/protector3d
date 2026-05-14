@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Club Wallpapers 3D</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="gallery-page">
+
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo">⚽ CLUB WALLS 3D</div>
+      <nav>
+        <a href="index.html" class="nav-link active">Galería</a>
+        <a href="editor.html" class="nav-link editor-link">Editor</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Fondos de Pantalla<br/><span>3D en Vivo</span></h1>
+      <p>Mostrá los colores de tu club con efecto parallax real.</p>
+    </div>
+    <div class="hero-bg"></div>
+  </section>
+
+  <section class="gallery-section">
+    <div class="section-title">
+      <h2>Elegí tu Club</h2>
+      <p>Todos los wallpapers incluyen efecto 3D con el giroscopio de tu teléfono</p>
+    </div>
+    <div class="gallery-grid" id="galleryGrid">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando wallpapers...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal de compra -->
+  <div class="modal-overlay" id="buyModal" style="display:none">
+    <div class="modal-box">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div class="modal-preview" id="modalPreview"></div>
+      <div class="modal-info">
+        <h3 id="modalClubName">Nombre del Club</h3>
+        <p class="modal-desc">Live Wallpaper 3D con efecto parallax real usando el giroscopio de tu teléfono Android.</p>
+        <ul class="modal-features">
+          <li>✅ Efecto 3D parallax real</li>
+          <li>✅ Compatible Android 8+</li>
+          <li>✅ Instalación en 1 minuto</li>
+          <li>✅ Sin publicidad</li>
+        </ul>
+        <div class="modal-price">
+          <span class="price-amount" id="modalPrice">$2.99</span>
+          <span class="price-currency">USD</span>
+        </div>
+        <button class="btn-buy" id="btnBuy">Comprar con MercadoPago</button>
+        <p class="modal-note">Recibirás el APK para instalar en tu Android</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal descarga post-pago -->
+  <div class="modal-overlay" id="downloadModal" style="display:none">
+    <div class="modal-box modal-box--success">
+      <div class="success-icon">🎉</div>
+      <h3>¡Pago exitoso!</h3>
+      <p>Tu wallpaper está listo para descargar.</p>
+      <a class="btn-download" id="btnDownload" href="#" download>
+        ⬇️ Descargar APK
+      </a>
+      <p class="install-hint">
+        <strong>¿Cómo instalar?</strong><br/>
+        1. Descargá el APK<br/>
+        2. Activá "Fuentes desconocidas" en Ajustes → Seguridad<br/>
+        3. Instalá y activá como Live Wallpaper
+      </p>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <p>Club Walls 3D © 2025 · Hecho con ⚽ en Argentina</p>
+  </footer>
+
+  <script src="gallery.js"></script>
+</body>
+</html>
