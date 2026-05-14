@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editor — Club Walls 3D</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="editor-page">
+
+  <!-- Login overlay -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-box">
+      <div class="login-logo">⚽ CLUB WALLS 3D</div>
+      <h2>Editor — Acceso Creador</h2>
+      <input type="password" id="loginPass" placeholder="Contraseña" class="login-input" />
+      <button class="btn-primary" id="loginBtn">Entrar</button>
+      <p class="login-error" id="loginError" style="display:none">Contraseña incorrecta</p>
+    </div>
+  </div>
+
+  <!-- Editor principal -->
+  <div class="editor-app" id="editorApp" style="display:none">
+
+    <aside class="editor-sidebar">
+      <div class="sidebar-header">
+        <span class="logo-small">⚽ EDITOR</span>
+        <a href="index.html" class="back-link">← Galería</a>
+      </div>
+
+      <div class="sidebar-section">
+        <label class="section-label">Nombre del Club</label>
+        <input type="text" id="clubName" placeholder="Ej: Boca Juniors" class="text-input" />
+      </div>
+
+      <div class="sidebar-section">
+        <label class="section-label">Precio (USD)</label>
+        <input type="number" id="clubPrice" value="2.99" step="0.01" min="0.99" class="text-input" />
+      </div>
+
+      <div class="sidebar-section">
+        <label class="section-label">Agregar Capa PNG</label>
+        <p class="hint-text">Usá PNGs con fondo transparente. La primera capa es el fondo.</p>
+        <label class="btn-upload" for="layerInput">
+          + Subir PNG a Cloudinary
+        </label>
+        <input type="file" id="layerInput" accept="image/png" multiple style="display:none" />
+        <div class="upload-progress" id="uploadProgress" style="display:none">
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+          <span id="progressText">Subiendo...</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <label class="section-label">Capas <span class="hint-text">(arrastrá para ordenar)</span></label>
+        <div class="layers-list" id="layersList">
+          <p class="empty-layers">No hay capas aún. Subí PNGs arriba.</p>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <label class="section-label">URL del APK</label>
+        <input type="text" id="apkUrl" placeholder="https://tu-repo.github.io/apks/club.apk" class="text-input" />
+        <p class="hint-text">Subí el APK a GitHub y pegá la URL directa aquí.</p>
+      </div>
+
+      <div class="sidebar-actions">
+        <button class="btn-secondary" id="btnSave">💾 Guardar en Sheets</button>
+        <button class="btn-primary" id="btnExport">📦 Exportar ZIP Android</button>
+      </div>
+
+      <div class="save-status" id="saveStatus"></div>
+    </aside>
+
+    <main class="editor-main">
+      <div class="preview-header">
+        <span>Preview en tiempo real — Mové el mouse para simular giroscopio</span>
+        <div class="phone-frame-toggle">
+          <button class="toggle-btn active" data-view="phone">📱 Teléfono</button>
+          <button class="toggle-btn" data-view="full">🖥️ Pantalla completa</button>
+        </div>
+      </div>
+
+      <div class="preview-container" id="previewContainer">
+        <div class="phone-frame">
+          <div class="phone-screen" id="phoneScreen">
+            <div class="parallax-stage" id="parallaxStage">
+              <p class="preview-placeholder">Subí capas PNG para ver el preview</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="config.js"></script>
+  <script src="editor.js"></script>
+</body>
+</html>
