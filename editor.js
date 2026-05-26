@@ -235,16 +235,15 @@ btnSave.addEventListener('click', async () => {
   const config = buildConfig();
 
   try {
-    const res = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=saveWallpaper`, {
-      method : 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body   : JSON.stringify({
-        nombre_club: clubName,
-        precio:      parseFloat(clubPriceInput.value) || 2.99,
-        url_apk:     apkUrlInput.value.trim(),
-        json_config: JSON.stringify(config),
-      })
+    const params = new URLSearchParams({
+      action:      'saveWallpaper',
+      nombre_club: clubName,
+      precio:      parseFloat(clubPriceInput.value) || 2.99,
+      url_apk:     apkUrlInput.value.trim(),
+      json_config: JSON.stringify(config),
     });
+
+    const res = await fetch(`${CONFIG.APPS_SCRIPT_URL}?${params.toString()}`);
 
     const data = await res.json();
 
