@@ -1,5 +1,6 @@
 // ============================================================
 //  gallery.js — Galería pública + flujo de compra MercadoPago
+//  VERSIÓN CORREGIDA: Todo GET para evitar CORS
 // ============================================================
 
 const galleryGrid   = document.getElementById('galleryGrid');
@@ -11,7 +12,7 @@ const btnDownload   = document.getElementById('btnDownload');
 
 let currentWallpaper = null;
 
-// ── 1. Cargar wallpapers desde Google Sheets vía Apps Script ──
+// ── 1. Cargar wallpapers desde Google Sheets ──
 async function loadWallpapers() {
   try {
     const res  = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getWallpapers`);
@@ -59,8 +60,8 @@ function createCard(wallpaper) {
     </div>
   `;
 
-  // Parallax en hover (escritorio)
-  const stage = card.querySelector('.card-preview-stage');
+  // Parallax en hover
+  const stage  = card.querySelector('.card-preview-stage');
   const layers = stage.querySelectorAll('.card-layer');
 
   card.addEventListener('mousemove', e => {
@@ -84,7 +85,7 @@ function createCard(wallpaper) {
   return card;
 }
 
-// ── 3. Aplicar parallax a capas ──
+// ── 3. Aplicar parallax ──
 function applyParallax(layers, cx, cy, maxPx) {
   layers.forEach(layer => {
     const depth = parseFloat(layer.dataset.depth) / 100;
@@ -101,7 +102,6 @@ function openBuyModal(wallpaper, config) {
   document.getElementById('modalClubName').textContent = wallpaper.nombre_club;
   document.getElementById('modalPrice').textContent    = `$${parseFloat(wallpaper.precio).toFixed(2)}`;
 
-  // Preview en modal
   const preview = document.getElementById('modalPreview');
   preview.innerHTML = config.layers.map((l, i) => `
     <div class="card-layer"
@@ -133,25 +133,21 @@ btnBuy.addEventListener('click', async () => {
   btnBuy.disabled    = true;
 
   try {
-    // Crear preference en Apps Script (que llama a MP API)
-    const res  = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=createPreference`, {
-      method : 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body   : JSON.stringify({
-        wallpaper_id:  currentWallpaper.id,
-        nombre_club:   currentWallpaper.nombre_club,
-        precio:        currentWallpaper.precio,
-        url_apk:       currentWallpaper.url_apk,
-        success_url:   `${CONFIG.BASE_URL}/index.html?payment=success&id=${currentWallpaper.id}`,
-        failure_url:   `${CONFIG.BASE_URL}/index.html?payment=failure`,
-        pending_url:   `${CONFIG.BASE_URL}/index.html?payment=pending`,
-      })
+    const params = new URLSearchParams({
+      action:       'createPreference',
+      wallpaper_id: currentWallpaper.id,
+      nombre_club:  currentWallpaper.nombre_club,
+      precio:       currentWallpaper.precio,
+      url_apk:      currentWallpaper.url_apk,
+      success_url:  `${CONFIG.BASE_URL}/index.html?payment=success&id=${currentWallpaper.id}`,
+      failure_url:  `${CONFIG.BASE_URL}/index.html?payment=failure`,
+      pending_url:  `${CONFIG.BASE_URL}/index.html?payment=pending`,
     });
 
+    const res  = await fetch(`${CONFIG.APPS_SCRIPT_URL}?${params.toString()}`);
     const data = await res.json();
 
     if (data.init_point) {
-      // Redirigir a MercadoPago
       window.location.href = data.init_point;
     } else {
       throw new Error(data.error || 'Sin init_point');
@@ -171,16 +167,14 @@ function handlePaymentReturn() {
   const id     = params.get('id');
 
   if (status === 'success' && id) {
-    // Buscar APK URL del wallpaper
     fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getWallpaper&id=${id}`)
       .then(r => r.json())
       .then(data => {
         if (data.wallpaper) {
-          btnDownload.href = data.wallpaper.url_apk;
+          btnDownload.href     = data.wallpaper.url_apk;
           btnDownload.download = `${data.wallpaper.nombre_club.replace(/\s+/g,'_')}_Wallpaper.apk`;
-          buyModal.style.display = 'none';
+          buyModal.style.display      = 'none';
           downloadModal.style.display = 'flex';
-          // Limpiar URL
           window.history.replaceState({}, '', window.location.pathname);
         }
       })
