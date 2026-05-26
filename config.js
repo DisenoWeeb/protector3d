@@ -33,6 +33,6 @@ const CONFIG = {
 
   // --- GITHUB PAGES ---
   // URL base donde está publicada tu web
-  BASE_URL: "https://disenoweeb.github.io/protector3d/editor",
+  BASE_URL: "https://disenoweeb.github.io/protector3d",
 
 };
