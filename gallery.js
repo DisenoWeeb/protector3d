@@ -111,7 +111,19 @@ async function loadWallpapers() {
 
 function parseWallpaperConfig(wallpaper) {
   const { json_config: jsonConfig } = wallpaper || {};
-  const config = typeof jsonConfig === 'string' ? JSON.parse(jsonConfig) : jsonConfig;
+
+  if (!jsonConfig) {
+    throw new Error('json_config vacío o ausente');
+  }
+
+  let config = jsonConfig;
+  if (typeof config === 'string') {
+    try {
+      config = JSON.parse(config);
+    } catch (error) {
+      throw new Error(`json_config string inválido: ${getErrorMessage(error)}`);
+    }
+  }
 
   if (!config || !Array.isArray(config.layers)) {
     throw new Error('json_config inválido: falta layers[]');
