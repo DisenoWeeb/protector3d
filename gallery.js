@@ -225,12 +225,19 @@ function openBuyModal(wallpaper, config) {
     modalParallaxBound = true;
   }
 
-  buyModal.style.display = 'flex';
+  buyModal.classList.add('is-open');
 }
 
 // ── 5. Cerrar modal ──
-modalClose.addEventListener('click', () => { buyModal.style.display = 'none'; });
-buyModal.addEventListener('click', e => { if (e.target === buyModal) buyModal.style.display = 'none'; });
+modalClose.addEventListener('click', () => {
+  buyModal.classList.remove('is-open');
+});
+
+buyModal.addEventListener('click', e => {
+  if (e.target === buyModal) {
+    buyModal.classList.remove('is-open');
+  }
+});
 
 // ── 6. Iniciar pago MercadoPago ──
 btnBuy.addEventListener('click', async () => {
@@ -280,8 +287,8 @@ function handlePaymentReturn() {
         if (data.wallpaper) {
           btnDownload.href     = data.wallpaper.url_apk;
           btnDownload.download = `${data.wallpaper.nombre_club.replace(/\s+/g,'_')}_Wallpaper.apk`;
-          buyModal.style.display      = 'none';
-          downloadModal.style.display = 'flex';
+          buyModal.classList.remove('is-open');
+         downloadModal.classList.add('is-open');
           window.history.replaceState({}, '', window.location.pathname);
         }
       })
