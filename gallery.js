@@ -11,11 +11,16 @@ const btnBuy        = document.getElementById('btnBuy');
 const btnDownload   = document.getElementById('btnDownload');
 
 let currentWallpaper = null;
+let modalParallaxBound = false;
+
+function getBaseUrl() {
+  return (CONFIG.BASE_URL || '').replace(/\/+$/, '');
+}
 
 // ── 1. Cargar wallpapers desde Google Sheets ──
 async function loadWallpapers() {
   try {
-    const res  = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getWallpapers`);
+    const res  = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getWallpapers&t=${Date.now()}`, { cache: 'no-store' });
     const data = await res.json();
 
     if (!data.wallpapers || data.wallpapers.length === 0) {
@@ -110,13 +115,22 @@ function openBuyModal(wallpaper, config) {
     </div>
   `).join('');
 
-  const layers = preview.querySelectorAll('.card-layer');
-  preview.addEventListener('mousemove', e => {
-    const rect = preview.getBoundingClientRect();
-    const cx = (e.clientX - rect.left) / rect.width  - 0.5;
-    const cy = (e.clientY - rect.top)  / rect.height - 0.5;
-    applyParallax(layers, cx, cy, 18);
-  });
+  if (!modalParallaxBound) {
+    preview.addEventListener('mousemove', e => {
+      const rect = preview.getBoundingClientRect();
+      const cx = (e.clientX - rect.left) / rect.width  - 0.5;
+      const cy = (e.clientY - rect.top)  / rect.height - 0.5;
+      applyParallax(preview.querySelectorAll('.card-layer'), cx, cy, 18);
+    });
+
+    preview.addEventListener('mouseleave', () => {
+      preview.querySelectorAll('.card-layer').forEach(l => {
+        l.style.transform = 'translate3d(0,0,0)';
+      });
+    });
+
+    modalParallaxBound = true;
+  }
 
   buyModal.style.display = 'flex';
 }
@@ -139,9 +153,9 @@ btnBuy.addEventListener('click', async () => {
       nombre_club:  currentWallpaper.nombre_club,
       precio:       currentWallpaper.precio,
       url_apk:      currentWallpaper.url_apk,
-      success_url:  `${CONFIG.BASE_URL}/index.html?payment=success&id=${currentWallpaper.id}`,
-      failure_url:  `${CONFIG.BASE_URL}/index.html?payment=failure`,
-      pending_url:  `${CONFIG.BASE_URL}/index.html?payment=pending`,
+      success_url:  `${getBaseUrl()}/index.html?payment=success&id=${currentWallpaper.id}`,
+      failure_url:  `${getBaseUrl()}/index.html?payment=failure`,
+      pending_url:  `${getBaseUrl()}/index.html?payment=pending`,
     });
 
     const res  = await fetch(`${CONFIG.APPS_SCRIPT_URL}?${params.toString()}`);
