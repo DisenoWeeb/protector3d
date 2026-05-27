@@ -279,7 +279,7 @@ btnExport.addEventListener('click', async () => {
     const pkg    = 'com.wallpaper.' + slug.replace(/[^a-z0-9]/g, '');
     const root   = zip.folder('LiveWallpaper_' + clubName.replace(/\s+/g, ''));
 
-    root.file('config.json', JSON.stringify(config, null, 2));
+    root.file('app/src/main/assets/config.json', JSON.stringify(config, null, 2));
 
     const kp = `app/src/main/kotlin/${pkg.replace(/\./g, '/')}/`;
     root.file(kp + 'MainActivity.kt',     buildMainActivity(pkg, clubName));
@@ -294,11 +294,15 @@ btnExport.addEventListener('click', async () => {
     root.file('app/src/main/res/layout/activity_main.xml', buildLayoutXml());
     root.file('app/src/main/AndroidManifest.xml',        buildManifest(pkg));
     root.file('app/build.gradle',                        buildAppGradle(pkg));
+    root.file('app/proguard-rules.pro',                  '');
     root.file('build.gradle',                            buildRootGradle());
     root.file('settings.gradle',                         buildSettingsGradle(slug));
     root.file('gradle.properties',                       buildGradleProperties());
-    root.file('.gitignore', '*.iml\n.gradle\n/local.properties\n/.idea\n/build\n');
+    root.file('.gitignore', '*.iml\n.gradle\n/local.properties\n/.idea\n/build\n/captures\n.externalNativeBuild\n.cxx\n');
+    root.file('gradlew',                                 buildGradlewSh());
+    root.file('gradlew.bat',                             buildGradlewBat());
     root.file('gradle/wrapper/gradle-wrapper.properties', buildGradleWrapper());
+    root.file('README.md',                               buildAndroidReadme(clubName));
 
     const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
     const url  = URL.createObjectURL(blob);
@@ -366,11 +370,11 @@ function buildLayoutXml() {
 }
 
 function buildAppGradle(pkg) {
-  return `plugins {\n    id 'com.android.application'\n    id 'org.jetbrains.kotlin.android'\n}\n\nandroid {\n    namespace '${pkg}'\n    compileSdk 34\n    defaultConfig {\n        applicationId "${pkg}"\n        minSdk 26\n        targetSdk 34\n        versionCode 1\n        versionName "1.0"\n    }\n    buildFeatures { viewBinding true }\n    buildTypes {\n        release {\n            minifyEnabled false\n            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'\n        }\n    }\n    compileOptions {\n        sourceCompatibility JavaVersion.VERSION_1_8\n        targetCompatibility JavaVersion.VERSION_1_8\n    }\n    kotlinOptions { jvmTarget = '1.8' }\n}\n\ndependencies {\n    implementation 'androidx.core:core-ktx:1.12.0'\n    implementation 'androidx.appcompat:appcompat:1.6.1'\n    implementation 'com.google.android.material:material:1.11.0'\n    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'\n    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'\n}\n`;
+  return `plugins {\n    id 'com.android.application'\n    id 'org.jetbrains.kotlin.android'\n}\n\nandroid {\n    namespace '${pkg}'\n    compileSdk 35\n\n    defaultConfig {\n        applicationId "${pkg}"\n        minSdk 26\n        targetSdk 35\n        versionCode 1\n        versionName "1.0"\n    }\n\n    buildFeatures {\n        viewBinding true\n    }\n\n    buildTypes {\n        release {\n            minifyEnabled false\n            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'\n        }\n    }\n\n    compileOptions {\n        sourceCompatibility JavaVersion.VERSION_17\n        targetCompatibility JavaVersion.VERSION_17\n    }\n\n    kotlinOptions {\n        jvmTarget = '17'\n    }\n}\n\ndependencies {\n    implementation 'androidx.core:core-ktx:1.15.0'\n    implementation 'androidx.appcompat:appcompat:1.7.0'\n    implementation 'com.google.android.material:material:1.12.0'\n    implementation 'androidx.constraintlayout:constraintlayout:2.2.0'\n    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'\n}\n`;
 }
 
 function buildRootGradle() {
-  return `plugins {\n    id 'com.android.application' version '8.2.0' apply false\n    id 'org.jetbrains.kotlin.android' version '1.9.0' apply false\n}\n`;
+  return `plugins {\n    id 'com.android.application' version '8.7.3' apply false\n    id 'org.jetbrains.kotlin.android' version '2.0.21' apply false\n}\n`;
 }
 
 function buildSettingsGradle(slug) {
@@ -382,5 +386,17 @@ function buildGradleProperties() {
 }
 
 function buildGradleWrapper() {
-  return `distributionBase=GRADLE_USER_HOME\ndistributionPath=wrapper/dists\ndistributionUrl=https\\://services.gradle.org/distributions/gradle-8.2-bin.zip\nzipStoreBase=GRADLE_USER_HOME\nzipStorePath=wrapper/dists\n`;
+  return `distributionBase=GRADLE_USER_HOME\ndistributionPath=wrapper/dists\ndistributionUrl=https\\://services.gradle.org/distributions/gradle-8.10.2-bin.zip\nnetworkTimeout=10000\nvalidateDistributionUrl=true\nzipStoreBase=GRADLE_USER_HOME\nzipStorePath=wrapper/dists\n`;
+}
+
+function buildGradlewSh() {
+  return `#!/bin/sh\n\n##############################################################################\n##\n##  Gradle start up script for POSIX generated by the editor\n##\n##############################################################################\n\nDIR=\"$(cd \"$(dirname \"$0\")\" && pwd -P)\"\nAPP_BASE_NAME=$(basename \"$0\")\nCLASSPATH=$DIR/gradle/wrapper/gradle-wrapper.jar\n\nif [ -n \"$JAVA_HOME\" ] ; then\n    JAVACMD=\"$JAVA_HOME/bin/java\"\nelse\n    JAVACMD=java\nfi\n\nexec \"$JAVACMD\" -classpath \"$CLASSPATH\" org.gradle.wrapper.GradleWrapperMain \"$@\"\n`;
+}
+
+function buildGradlewBat() {
+  return `@ECHO OFF\r\nSET DIR=%~dp0\r\nSET APP_BASE_NAME=%~n0\r\nSET CLASSPATH=%DIR%\\gradle\\wrapper\\gradle-wrapper.jar\r\n\r\nIF DEFINED JAVA_HOME (\r\n  SET JAVA_EXE=%JAVA_HOME%\\bin\\java.exe\r\n) ELSE (\r\n  SET JAVA_EXE=java.exe\r\n)\r\n\r\n\"%JAVA_EXE%\" -classpath \"%CLASSPATH%\" org.gradle.wrapper.GradleWrapperMain %*\r\n`;
+}
+
+function buildAndroidReadme(clubName) {
+  return `# ${clubName} Live Wallpaper 3D (Android)\n\nProyecto Android generado desde el editor web para Android Studio Panda 4 (2025.3.4 Patch 1).\n\n## Pasos rápidos\n\n1. Descargar el ZIP desde el editor web y descomprimirlo.\n2. Abrir la carpeta del proyecto en Android Studio.\n3. Esperar a que finalice **Gradle Sync**.\n4. Ir a **Build > Build APK(s)** o **Build > Generate Signed Bundle / APK**.\n5. Instalar el APK en el celular y activar el live wallpaper desde la app.\n\n## Notas\n\n- El archivo de configuración se guarda en \`app/src/main/assets/config.json\`.\n- El motor de parallax descarga capas PNG/JPG desde URLs remotas definidas en esa configuración.\n- Si Android Studio pide actualizar componentes del SDK, aceptar e instalar.\n`;
 }
