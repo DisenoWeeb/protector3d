@@ -1,5 +1,5 @@
 // ============================================================
-//  editor.js — VERSIÓN FINAL CON JSONP
+//  editor.js — VERSIÓN FINAL CON JSONP 2
 // ============================================================
 
 const state = { layers: [], dragSrc: null };
