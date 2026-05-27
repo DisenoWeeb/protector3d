@@ -17,31 +17,112 @@ function getBaseUrl() {
   return (CONFIG.BASE_URL || '').replace(/\/+$/, '');
 }
 
+function getErrorMessage(error) {
+  if (!error) return 'Error desconocido.';
+  if (typeof error === 'string') return error;
+  return error.message || String(error);
+}
+
+function showGalleryError(message, details = '') {
+  const fullMessage = details ? `${message}\n${details}` : message;
+  console.error('[Gallery] Error visible para usuario:', fullMessage);
+
+  galleryGrid.innerHTML = `
+    <div style="grid-column:1/-1;text-align:center;color:#ff5252;padding:40px 20px;line-height:1.5">
+      <p style="font-weight:700;margin-bottom:8px">No se pudo cargar la galería.</p>
+      <p style="margin:0">${message}</p>
+      ${details ? `<p style="margin-top:10px;color:#ffb3b3;word-break:break-word"><small>${details}</small></p>` : ''}
+    </div>
+  `;
+}
+
 // ── 1. Cargar wallpapers desde Google Sheets ──
 async function loadWallpapers() {
   try {
-    const res  = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getWallpapers&t=${Date.now()}`, { cache: 'no-store' });
-    const data = await res.json();
+    if (typeof CONFIG === 'undefined') {
+      throw new Error('CONFIG no está definido. Verificá que config.js cargue antes que gallery.js.');
+    }
 
-    if (!data.wallpapers || data.wallpapers.length === 0) {
+    console.log('[Gallery] CONFIG cargado:', CONFIG);
+
+    if (!CONFIG.APPS_SCRIPT_URL || typeof CONFIG.APPS_SCRIPT_URL !== 'string') {
+      throw new Error('CONFIG.APPS_SCRIPT_URL no está definido o no es válido.');
+    }
+
+    const endpoint = `${CONFIG.APPS_SCRIPT_URL}?action=getWallpapers&t=${Date.now()}`;
+    console.log('[Gallery] URL llamada:', endpoint);
+
+    const res = await fetch(endpoint, { cache: 'no-store' });
+
+    if (!res.ok) {
+      throw new Error(`Apps Script respondió HTTP ${res.status} ${res.statusText}`);
+    }
+
+    const rawText = await res.text();
+    let data;
+
+    try {
+      data = JSON.parse(rawText);
+    } catch (parseError) {
+      throw new Error(`Apps Script no devolvió JSON válido. Respuesta: ${rawText.slice(0, 300)}`);
+    }
+
+    console.log('[Gallery] Respuesta recibida:', data);
+
+    if (!data || !Array.isArray(data.wallpapers)) {
+      throw new Error('La respuesta no contiene data.wallpapers como array.');
+    }
+
+    if (data.wallpapers.length === 0) {
       galleryGrid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:60px 0">No hay wallpapers disponibles aún.</p>';
       return;
     }
 
+    const validWallpapers = [];
+    const parseErrors = [];
+
+    data.wallpapers.forEach((wallpaper, index) => {
+      try {
+        const parsedConfig = parseWallpaperConfig(wallpaper);
+        validWallpapers.push({ ...wallpaper, _parsedConfig: parsedConfig });
+      } catch (error) {
+        const reason = getErrorMessage(error);
+        parseErrors.push(`Item #${index + 1} (${wallpaper?.nombre_club || 'sin nombre'}): ${reason}`);
+      }
+    });
+
+    if (parseErrors.length > 0) {
+      console.error('[Gallery] Errores al parsear json_config:', parseErrors);
+    }
+
+    if (validWallpapers.length === 0) {
+      throw new Error(`No se pudo renderizar ningún wallpaper. ${parseErrors[0] || 'Todos tienen json_config inválido.'}`);
+    }
+
     galleryGrid.innerHTML = '';
-    data.wallpapers.forEach(w => galleryGrid.appendChild(createCard(w)));
+    validWallpapers.forEach(w => galleryGrid.appendChild(createCard(w)));
 
   } catch (err) {
-    galleryGrid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#ff5252;padding:60px 0">Error al cargar. Verificá tu conexión.</p>';
-    console.error(err);
+    const exactError = getErrorMessage(err);
+    console.error('[Gallery] Error exacto en loadWallpapers:', err);
+    showGalleryError('Error al cargar wallpapers.', exactError);
   }
+}
+
+function parseWallpaperConfig(wallpaper) {
+  const { json_config: jsonConfig } = wallpaper || {};
+  const config = typeof jsonConfig === 'string' ? JSON.parse(jsonConfig) : jsonConfig;
+
+  if (!config || !Array.isArray(config.layers)) {
+    throw new Error('json_config inválido: falta layers[]');
+  }
+
+  return config;
 }
 
 // ── 2. Crear tarjeta de wallpaper ──
 function createCard(wallpaper) {
-  const config = typeof wallpaper.json_config === 'string'
-    ? JSON.parse(wallpaper.json_config)
-    : wallpaper.json_config;
+  const config = wallpaper._parsedConfig || parseWallpaperConfig(wallpaper);
 
   const card = document.createElement('div');
   card.className = 'wallpaper-card';
