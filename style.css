@@ -262,11 +262,15 @@ nav { display: flex; gap: 24px; }
   inset: 0;
   background: rgba(0,0,0,0.85);
   z-index: 200;
-  display: flex !important;
+  display: none;
   align-items: center;
   justify-content: center;
   padding: 24px;
   backdrop-filter: blur(4px);
+}
+
+.modal-overlay.is-open {
+  display: flex;
 }
 
 .modal-box {
