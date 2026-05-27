@@ -235,6 +235,38 @@ btnSave.addEventListener('click', async () => {
   if (!clubName)                 { alert('Ingresá el nombre del club'); return; }
   if (state.layers.length === 0) { alert('Agregá al menos una capa');  return; }
 
+  const layersForSheets = state.layers
+    .map((layer, index) => ({
+      index,
+      url: typeof layer.url === 'string' ? layer.url.trim() : '',
+      depth: Number.isFinite(layer.depth) ? layer.depth : 50,
+    }));
+
+  const firstInvalidLayer = layersForSheets.find(layer => !layer.url);
+  if (firstInvalidLayer) {
+    const msg = `Falta URL en la capa ${firstInvalidLayer.index + 1}. Volvé a subirla antes de guardar.`;
+    saveStatus.textContent = `❌ ${msg}`;
+    alert(msg);
+    return;
+  }
+
+  const jsonConfigObject = {
+    layers: layersForSheets.map(layer => ({
+      url: layer.url,
+      depth: layer.depth,
+    })),
+  };
+
+  if (!Array.isArray(jsonConfigObject.layers) || jsonConfigObject.layers.length === 0) {
+    const msg = 'json_config inválido: falta layers[] con al menos una capa.';
+    saveStatus.textContent = `❌ ${msg}`;
+    alert(msg);
+    return;
+  }
+
+  const jsonConfigString = JSON.stringify(jsonConfigObject);
+  console.log('json_config final (saveWallpaper):', jsonConfigString);
+
   btnSave.disabled       = true;
   saveStatus.textContent = '💾 Guardando...';
 
@@ -244,7 +276,7 @@ btnSave.addEventListener('click', async () => {
       nombre_club: clubName,
       precio:      parseFloat(clubPriceInput.value) || 2.99,
       url_apk:     apkUrlInput.value.trim(),
-      json_config: JSON.stringify(buildConfig()),
+      json_config: jsonConfigString,
     });
 
     const data = await fetchJsonp(`${CONFIG.APPS_SCRIPT_URL}?${params.toString()}`);
