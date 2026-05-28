@@ -62,6 +62,17 @@ body {
   letter-spacing: 4px;
   color: #ffffff;
   text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-img {
+  height: 32px;
+  width: auto;
+  display: block;
+  /* Si el isologo es oscuro, invertirlo para que se vea en fondo negro */
+  filter: brightness(0) invert(1);
 }
 
 nav { display: flex; gap: 28px; }
