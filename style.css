@@ -5,7 +5,7 @@
 
 /* --- Variables --- */
 
- 
+ :root {
   --bg-dark:      #0a0a0a;
   --bg-card:      #111111;
   --bg-card2:     #181818;
