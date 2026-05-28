@@ -12,6 +12,18 @@ const btnDownload   = document.getElementById('btnDownload');
 
 let currentWallpaper = null;
 let modalParallaxBound = false;
+const parallaxTargets = [];
+let motionEnabled = false;
+let motionPromptShown = false;
+let motionCurrent = { x: 0, y: 0 };
+let motionTarget = { x: 0, y: 0 };
+let motionRafId = null;
+let modalParallaxTarget = null;
+
+const MOTION_LIMIT = 0.35;
+const MOTION_SMOOTH = 0.1;
+const CARD_MAX_PX = 12;
+const MODAL_MAX_PX = 18;
 
 function getBaseUrl() {
   return (CONFIG.BASE_URL || '').replace(/\/+$/, '');
@@ -166,7 +178,7 @@ function createCard(wallpaper) {
     const rect = card.getBoundingClientRect();
     const cx = (e.clientX - rect.left) / rect.width  - 0.5;
     const cy = (e.clientY - rect.top)  / rect.height - 0.5;
-    applyParallax(layers, cx, cy, 12);
+    applyParallax(layers, cx, cy, CARD_MAX_PX);
   });
 
   card.addEventListener('mouseleave', () => {
@@ -180,7 +192,15 @@ function createCard(wallpaper) {
 
   card.addEventListener('click', () => openBuyModal(wallpaper, config));
 
+  registerParallaxTarget(layers, CARD_MAX_PX);
+
   return card;
+}
+
+function registerParallaxTarget(layers, maxPx) {
+  const target = { layers, maxPx };
+  parallaxTargets.push(target);
+  return target;
 }
 
 // ── 3. Aplicar parallax ──
@@ -191,6 +211,88 @@ function applyParallax(layers, cx, cy, maxPx) {
     const ty = cy * maxPx * depth;
     layer.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
   });
+}
+
+function applyParallaxToAllTargets(cx, cy) {
+  parallaxTargets.forEach(target => {
+    applyParallax(target.layers, cx, cy, target.maxPx);
+  });
+}
+
+function animateMotionParallax() {
+  motionCurrent.x += (motionTarget.x - motionCurrent.x) * MOTION_SMOOTH;
+  motionCurrent.y += (motionTarget.y - motionCurrent.y) * MOTION_SMOOTH;
+  applyParallaxToAllTargets(motionCurrent.x, motionCurrent.y);
+  motionRafId = requestAnimationFrame(animateMotionParallax);
+}
+
+function startMotionLoop() {
+  if (motionRafId) return;
+  motionRafId = requestAnimationFrame(animateMotionParallax);
+}
+
+function normalizeAngle(value, maxAngle = 35) {
+  if (typeof value !== 'number' || Number.isNaN(value)) return 0;
+  const normalized = Math.max(-1, Math.min(1, value / maxAngle));
+  return normalized * MOTION_LIMIT;
+}
+
+function onDeviceOrientation(event) {
+  if (typeof event.gamma !== 'number' || typeof event.beta !== 'number') return;
+  motionTarget.x = normalizeAngle(event.gamma, 30);
+  motionTarget.y = normalizeAngle(-event.beta, 45);
+}
+
+function addMotionEnableButton() {
+  if (motionPromptShown) return;
+  motionPromptShown = true;
+
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'motion-enable-btn';
+  btn.textContent = 'Activar movimiento';
+  btn.addEventListener('click', async () => {
+    const ok = await enableMobileMotion();
+    if (ok) btn.remove();
+  });
+
+  document.body.appendChild(btn);
+}
+
+async function enableMobileMotion() {
+  if (motionEnabled) return true;
+  if (!('DeviceOrientationEvent' in window)) return false;
+
+  try {
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+      const permission = await DeviceOrientationEvent.requestPermission();
+      if (permission !== 'granted') return false;
+    }
+
+    window.addEventListener('deviceorientation', onDeviceOrientation);
+    motionEnabled = true;
+    startMotionLoop();
+    return true;
+  } catch (error) {
+    console.warn('[Gallery] No se pudo activar deviceorientation:', error);
+    return false;
+  }
+}
+
+function isMobileLike() {
+  return window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+}
+
+function initMobileParallax() {
+  if (!isMobileLike()) return;
+  if (!('DeviceOrientationEvent' in window)) return;
+
+  if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+    addMotionEnableButton();
+    return;
+  }
+
+  enableMobileMotion();
 }
 
 // ── 4. Modal de compra ──
@@ -213,7 +315,7 @@ function openBuyModal(wallpaper, config) {
       const rect = preview.getBoundingClientRect();
       const cx = (e.clientX - rect.left) / rect.width  - 0.5;
       const cy = (e.clientY - rect.top)  / rect.height - 0.5;
-      applyParallax(preview.querySelectorAll('.card-layer'), cx, cy, 18);
+      applyParallax(preview.querySelectorAll('.card-layer'), cx, cy, MODAL_MAX_PX);
     });
 
     preview.addEventListener('mouseleave', () => {
@@ -224,6 +326,12 @@ function openBuyModal(wallpaper, config) {
 
     modalParallaxBound = true;
   }
+
+  if (modalParallaxTarget) {
+    const index = parallaxTargets.indexOf(modalParallaxTarget);
+    if (index >= 0) parallaxTargets.splice(index, 1);
+  }
+  modalParallaxTarget = registerParallaxTarget(preview.querySelectorAll('.card-layer'), MODAL_MAX_PX);
 
   buyModal.classList.add('is-open');
 }
@@ -303,3 +411,4 @@ function handlePaymentReturn() {
 // ── Init ──
 loadWallpapers();
 handlePaymentReturn();
+initMobileParallax();
