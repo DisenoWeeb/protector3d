@@ -29,7 +29,7 @@ const CONFIG = {
   // 2. En Developers → Credenciales → Producción
   // 3. Copiá tu Public Key aquí
   // NOTA: El preference_id se genera desde Apps Script
-  MERCADOPAGO_PUBLIC_KEY: "APP_USR-1346782831864696-062412-2c137b40d5e9acd66f01f24b4906a6c3-803088979",
+  MERCADOPAGO_PUBLIC_KEY: "APP_USR-4b134e7e-5b8a-4a0a-87af-813507e8e60a",
 
   // --- GITHUB PAGES ---
   // URL base donde está publicada tu web
