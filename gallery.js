@@ -164,7 +164,7 @@ function createCard(wallpaper) {
     <div class="card-info">
       <div class="card-club-name">${wallpaper.nombre_club}</div>
       <div class="card-meta">
-        <span class="card-price">USD $${parseFloat(wallpaper.precio).toFixed(2)}</span>
+        <span class="card-price">$${parseFloat(wallpaper.precio).toFixed(0)} ARS</span>
         <button class="card-btn">COMPRAR</button>
       </div>
     </div>
@@ -300,7 +300,7 @@ function openBuyModal(wallpaper, config) {
   currentWallpaper = wallpaper;
 
   document.getElementById('modalClubName').textContent = wallpaper.nombre_club;
-  document.getElementById('modalPrice').textContent    = `$${parseFloat(wallpaper.precio).toFixed(2)}`;
+  document.getElementById('modalPrice').textContent    = `$${parseFloat(wallpaper.precio).toFixed(0)}`;
 
   const preview = document.getElementById('modalPreview');
   preview.innerHTML = config.layers.map((l, i) => `
