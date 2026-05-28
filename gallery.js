@@ -1,6 +1,6 @@
 // ============================================================
 //  gallery.js — Galería pública + flujo de compra MercadoPago
-//  VERSIÓN CORREGIDA: Todo GET para evitar CORS 2
+//  VERSIÓN CORREGIDA: Todo GET para evitar CORS
 // ============================================================
 
 const galleryGrid   = document.getElementById('galleryGrid');
