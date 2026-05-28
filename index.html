@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Club Wallpapers 3D</title>
+  <title>Club Walls — Fondos de Pantalla 3D</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body class="gallery-page">
 
   <header class="site-header">
     <div class="header-inner">
-      <div class="logo">⚽ CLUB WALLS 3D</div>
+      <div class="logo">CLUB WALLS</div>
       <nav>
-        <a href="./index.html" class="nav-link active">Galería</a>
+        <a href="./index.html" class="nav-link active">Tienda</a>
         <a href="./editor.html" class="nav-link editor-link">Editor</a>
       </nav>
     </div>
@@ -22,21 +22,22 @@
 
   <section class="hero">
     <div class="hero-content">
-      <h1>Fondos de Pantalla<br/><span>3D en Vivo</span></h1>
-      <p>Mostrá los colores de tu club con efecto parallax real.</p>
+      <p class="hero-eyebrow">Live Wallpapers · Android</p>
+      <h1>Los colores<br/><span>de tu club.</span></h1>
+      <p class="hero-sub">Fondos de pantalla en vivo con efecto 3D real para clubes y agrupaciones deportivas.</p>
     </div>
     <div class="hero-bg"></div>
   </section>
 
   <section class="gallery-section">
     <div class="section-title">
-      <h2>Elegí tu Club</h2>
-      <p>Todos los wallpapers incluyen efecto 3D con el giroscopio de tu teléfono</p>
+      <h2>Colección</h2>
+      <p>Cada diseño es único. Todos incluyen efecto parallax 3D con movimiento real.</p>
     </div>
     <div class="gallery-grid" id="galleryGrid">
       <div class="loading-state">
         <div class="spinner"></div>
-        <p>Cargando wallpapers...</p>
+        <p>Cargando...</p>
       </div>
     </div>
   </section>
@@ -48,12 +49,12 @@
       <div class="modal-preview" id="modalPreview"></div>
       <div class="modal-info">
         <h3 id="modalClubName">Nombre del Club</h3>
-        <p class="modal-desc">Live Wallpaper 3D con efecto parallax real usando el giroscopio de tu teléfono Android.</p>
+        <p class="modal-desc">Fondo de pantalla en vivo con efecto parallax 3D. Las capas se mueven con el celular dando profundidad real a tu pantalla.</p>
         <ul class="modal-features">
-          <li>✅ Efecto 3D parallax real</li>
-          <li>✅ Compatible Android 8+</li>
-          <li>✅ Instalación en 1 minuto</li>
-          <li>✅ Sin publicidad</li>
+          <li>✦ Efecto parallax 3D real</li>
+          <li>✦ Compatible Android 8+</li>
+          <li>✦ Instalación en 1 minuto</li>
+          <li>✦ Sin publicidad</li>
         </ul>
         <div class="modal-price">
           <span class="price-amount" id="modalPrice">$500</span>
@@ -66,25 +67,25 @@
   </div>
 
   <!-- Modal descarga post-pago -->
-  <div class="modal-overlay" id="downloadModal" >
+  <div class="modal-overlay" id="downloadModal">
     <div class="modal-box modal-box--success">
-      <div class="success-icon">🎉</div>
-      <h3>¡Pago exitoso!</h3>
+      <div class="success-icon">✦</div>
+      <h3>¡Listo!</h3>
       <p>Tu wallpaper está listo para descargar.</p>
       <a class="btn-download" id="btnDownload" href="#" download>
-        ⬇️ Descargar APK-
+        Descargar APK
       </a>
       <p class="install-hint">
         <strong>¿Cómo instalar?</strong><br/>
         1. Descargá el APK<br/>
         2. Activá "Fuentes desconocidas" en Ajustes → Seguridad<br/>
-        3. Instalá y activá como Live Wallpaper
+        3. Instalá y seleccioná como fondo de pantalla en vivo
       </p>
     </div>
   </div>
 
   <footer class="site-footer">
-    <p>Club Walls 3D © 2025 · Hecho con ⚽ en Argentina</p>
+    <p>Club Walls © 2025 · Argentina</p>
   </footer>
 
   <script src="config.js"></script>
