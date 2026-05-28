@@ -22,7 +22,7 @@ const CONFIG = {
   // 2. Pegá el código de apps-script/Code.gs
   // 3. Deployá como Web App (acceso: Anyone)
   // 4. Copiá la URL aquí
-  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyjwo6HXmAz2QZyKo60HGS9tXLs8E5FwmIy17-LBBjmQjRJgJhItRuF-mLpCfzZg4CR/exec",
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyKeq8-cuEopRhU_WSVBLUowTUgunjNEIL6eOsStMIZr_Jl1Z-iNy70aoB2ojNKpSoP/exec",
 
   // --- MERCADOPAGO ---
   // 1. Creá cuenta en mercadopago.com.ar
