@@ -350,19 +350,28 @@ nav { display: flex; gap: 28px; }
 }
 
 .modal-close {
-  position: absolute;
-  top: 12px; right: 12px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid var(--border);
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  background: rgba(20,20,20,0.92);
+  border: 1px solid rgba(255,255,255,0.25);
   color: #fff;
-  width: 30px; height: 30px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   cursor: pointer;
-  font-size: 0.8rem;
-  z-index: 1;
+  font-size: 1rem;
+  z-index: 999;
   transition: background 0.2s;
+  /* Área de toque generosa en mobile */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .modal-close:hover { background: rgba(255,255,255,0.18); }
+.modal-close:active { background: rgba(255,255,255,0.25); transform: scale(0.95); }
 
 /* ✅ Preview del modal también con relación de aspecto correcta */
 .modal-preview {
